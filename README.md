@@ -32,3 +32,17 @@ See the classroom instruction and code comments for more details on each of thes
 2. Make a build directory in the top level directory: `mkdir build && cd build`
 3. Compile: `cmake .. && make`
 4. Run it: `./2D_feature_tracking`.
+
+
+## Performance Evaluation (task 7-9)
+
+- Performance Evaluation 1: Number of keypoints and distributiion of neighbourhood size for each detector
+
+
+- Performance Evaluation 2: Number of matched keypoints for all possible combinations of detectors and descriptors
+
+- Performance Evaluation 3: Time to take for keypoint detection and descriptor extraction
+
+- TOP3 recomendation of detector / descriptor combination
+
+- (for the details, see `results.csv`)
