@@ -46,6 +46,10 @@ int main(int argc, const char *argv[])
 
     /* MAIN LOOP OVER ALL IMAGES */
 
+    float total_time =0; 
+    int matched_num =0; 
+    
+
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
     {
         /* LOAD IMAGE INTO BUFFER */
@@ -164,6 +168,19 @@ int main(int argc, const char *argv[])
         // push keypoints and descriptor for current frame to end of data buffer
         (dataBuffer.end() - 1)->keypoints = keypoints;
         cout << "#2 : DETECT KEYPOINTS done" << endl;
+        
+        float diameter_sum; 
+        for (cv::KeyPoint kp: keypoints){
+            diameter_sum += kp.size;
+        }
+
+        cout << "#2 : DETECT KEYPOINTS done" << endl;
+
+        float ave_diameter = diameter_sum / keypoints.size(); 
+        
+        cout << "Detector: " << detectorType << "  Number of keypoints: " << keypoints.size() << "  neibourhood size: " << ave_diameter << std::endl;
+        
+
 
         /* EXTRACT KEYPOINT DESCRIPTORS */
 
@@ -172,7 +189,7 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        string descriptorType = "FREAK"; // BRISK (original), BRIEF, ORB, FREAK, AKAZE, SIFT
+        string descriptorType = "SIFT"; // BRISK (original), BRIEF, ORB, FREAK, AKAZE, SIFT
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
@@ -188,7 +205,13 @@ int main(int argc, const char *argv[])
 
             vector<cv::DMatch> matches;
             string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
-            string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
+
+            if (descriptorType.compare("SIFT")==0){
+                 descriptorType = "DES_HOG"; 
+            } else {
+                 descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
+             }
+            
             string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
 
             //// STUDENT ASSIGNMENT
@@ -204,7 +227,9 @@ int main(int argc, const char *argv[])
             // store matches in current data frame
             (dataBuffer.end() - 1)->kptMatches = matches;
 
-            cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" << endl;
+            matched_num += matches.size();
+
+            cout << "#4 : MATCH KEYPOINT DESCRIPTORS done" <<  " matched number: " << matches.size() << endl;
 
             // visualize matches between current and previous image
             bVis = true;
@@ -227,6 +252,8 @@ int main(int argc, const char *argv[])
         }
 
     } // eof loop over all images
+
+    std::cout << "number of matches:" << matched_num << std::endl; 
 
     return 0;
 }

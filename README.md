@@ -37,12 +37,27 @@ See the classroom instruction and code comments for more details on each of thes
 ## Performance Evaluation (task 7-9)
 
 - Performance Evaluation 1: Number of keypoints and distributiion of neighbourhood size for each detector
+    - Average keypoints of 10 images
+        - Harris: 25
+        - FAST: 409
+        - BRISK: 276
+        - ORB: 116
+        - AKAZE: 167
+        - SIFT: 139
+    - Average neibour hood size (diameter) of keypoints of 10 images
+        - Harris: 28
+        - FAST: 39
+        - BRISK: 122
+        - ORB: 280
+        - AKAZE: 41
+        - SIFT: 26
 
+- Performance Evaluation 2: Number of matched keypoints for all possible combinations of detectors and descriptors -> see below
+- Performance Evaluation 3: Time to take for keypoint detection and descriptor extraction -> see below
 
-- Performance Evaluation 2: Number of matched keypoints for all possible combinations of detectors and descriptors
-
-- Performance Evaluation 3: Time to take for keypoint detection and descriptor extraction
+<img src="images/result.png"  />
 
 - TOP3 recomendation of detector / descriptor combination
-
-- (for the details, see `results.csv`)
+    - SIFT + BRIEF (large number of key points & high speed)
+    - FATST + BRIEF (largest number of key points & no patent limitation)
+    - HARRIS + BRIEF or BRISK (fastest)

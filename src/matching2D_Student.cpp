@@ -13,7 +13,13 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 
     if (matcherType.compare("MAT_BF") == 0)
     {
-        int normType = cv::NORM_HAMMING;
+        int normType;
+        if (descriptorType.compare("DES_HOG")==0){
+            normType = cv::NORM_L2;
+        } else {
+            normType = cv::NORM_HAMMING;
+        }
+        
         matcher = cv::BFMatcher::create(normType, crossCheck);
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
@@ -45,6 +51,8 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
         }
         
     }
+
+
 }
 
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
