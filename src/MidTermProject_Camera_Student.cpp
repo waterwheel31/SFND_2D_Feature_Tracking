@@ -6,6 +6,7 @@
 #include <vector>
 #include <cmath>
 #include <limits>
+#include <deque>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -37,7 +38,10 @@ int main(int argc, const char *argv[])
 
     // misc
     int dataBufferSize = 2;       // no. of images which are held in memory (ring buffer) at the same time
-    vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
+    
+    //vector<DataFrame> dataBuffer; // list of data frames which are held in memory at the same time
+    deque<DataFrame> dataBuffer;  // deque version 
+    
     bool bVis = false;            // visualize results
 
     /* MAIN LOOP OVER ALL IMAGES */
@@ -62,7 +66,24 @@ int main(int argc, const char *argv[])
         // push image into data frame buffer
         DataFrame frame;
         frame.cameraImg = imgGray;
+        
+        // Option to use deque  
         dataBuffer.push_back(frame);
+        if (dataBuffer.size() > dataBufferSize) {dataBuffer.pop_front();} 
+
+        // Option to use vector instead of deque (not used) 
+        /*
+        if (dataBuffer.size() < dataBufferSize){
+            dataBuffer.push_back(frame);
+        } else {
+            for (int i=0; i < dataBufferSize - 1; i++){
+                dataBuffer[i] = dataBuffer[i+1];
+            }
+            dataBuffer[dataBuffer.size()-1] = frame;
+        }
+        */ 
+
+        
 
         //// EOF STUDENT ASSIGNMENT
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
@@ -71,7 +92,9 @@ int main(int argc, const char *argv[])
 
         // extract 2D keypoints from current image
         vector<cv::KeyPoint> keypoints; // create empty feature list for current image
-        string detectorType = "SHITOMASI";
+        //string detectorType = "SHITOMASI";
+        string detectorType = "HARRIS";
+
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
@@ -79,7 +102,25 @@ int main(int argc, const char *argv[])
 
         if (detectorType.compare("SHITOMASI") == 0)
         {
-            detKeypointsShiTomasi(keypoints, imgGray, false);
+            detKeypointsShiTomasi(keypoints, imgGray, true);
+        }
+        else if (detectorType.compare("HARRIS") == 0){
+            detKeypointsHarris(keypoints, imgGray, true);
+        }
+        else if (detectorType.compare("FAST") == 0){
+            detKeypointsFAST(keypoints, imgGray, true);
+        }
+        else if (detectorType.compare("BRISK") == 0){
+            detKeypointsBRISK(keypoints, imgGray, true);
+        }
+        else if (detectorType.compare("ORB") == 0){
+            detKeypointsORB(keypoints, imgGray, true);
+        }
+        else if (detectorType.compare("AKAZE") == 0){
+            detKeypointsAKAZE(keypoints, imgGray, true);
+        }
+        else if (detectorType.compare("SIFT") == 0){
+            detKeypointsSIFT(keypoints, imgGray, true);
         }
         else
         {
@@ -95,7 +136,13 @@ int main(int argc, const char *argv[])
         cv::Rect vehicleRect(535, 180, 180, 150);
         if (bFocusOnVehicle)
         {
-            // ...
+            std::vector<cv::KeyPoint> focusKeyPoints; 
+            for (cv::KeyPoint kp: keypoints){
+                if (vehicleRect.contains(kp.pt)){
+                    focusKeyPoints.push_back(kp);
+                }
+            }
+            keypoints = focusKeyPoints; 
         }
 
         //// EOF STUDENT ASSIGNMENT
@@ -125,7 +172,7 @@ int main(int argc, const char *argv[])
         //// -> BRIEF, ORB, FREAK, AKAZE, SIFT
 
         cv::Mat descriptors;
-        string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
+        string descriptorType = "FREAK"; // BRISK (original), BRIEF, ORB, FREAK, AKAZE, SIFT
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
